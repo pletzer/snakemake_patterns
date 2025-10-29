@@ -1,0 +1,24 @@
+rule all:
+    input:
+        "c.txt"
+
+rule a:
+    output:
+        "a.txt"
+    shell:
+        "echo 'Output from task A' > {output}"
+
+rule b:
+    output:
+        "b.txt"
+    shell:
+        "echo 'Output from task B' > {output}"
+
+rule c:
+    input:
+        a="a.txt",
+        b="b.txt"
+    output:
+        "c.txt"
+    shell:
+        "cat {input.a} {input.b} > {output}"
