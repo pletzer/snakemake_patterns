@@ -1,0 +1,34 @@
+
+import random
+
+# Number of parallel prep tasks — change this easily!
+N = 100
+
+rule all:
+    input:
+        "final.txt"
+
+rule prep:
+    output:
+        "prep{idx}.txt"
+    params:
+        sleep_time=lambda wildcards: random.randint(1, 10)
+    shell:
+        """
+        echo "Running {wildcards.idx}, sleeping {params.sleep_time}s"
+        sleep {params.sleep_time}
+        echo "Output from prep{wildcards.idx}" > {output}
+        """
+
+rule final:
+    input:
+        expand("prep{idx}.txt", idx=range(N))
+    output:
+        "final.txt"
+    
+    # Since this task is defined with run: instead of shell:, Snakemake executes it directly, not via Slurm.
+    run:
+        """
+        cat {input} > {output}
+        echo "All prep tasks complete. Final result written to {output}"
+        """
