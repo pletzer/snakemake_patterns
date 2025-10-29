@@ -2,7 +2,9 @@
 import random
 
 # Number of parallel prep tasks — change this easily!
-N = 100
+N = 10
+
+localrules: final  # ensures final always runs interactively
 
 rule all:
     input:
@@ -26,9 +28,11 @@ rule final:
     output:
         "final.txt"
     
-    # Since this task is defined with run: instead of shell:, Snakemake executes it directly, not via Slurm.
     run:
-        """
-        cat {input} > {output}
-        echo "All prep tasks complete. Final result written to {output}"
-        """
+        # run expects Python code. do not use quotes here
+        print("Running final task interactively...")
+        with open(output[0], 'w') as f:
+            for infile in input:
+                with open(infile) as inf:
+                    f.write(inf.read())
+        print(f"All prep tasks complete. Final result written to {output[0]}")
